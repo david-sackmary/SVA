@@ -2,7 +2,7 @@ require 'csv'
 require 'optparse'
 
 if ARGV.length != 3
-  abort "usage: hi.rb input.csv output.csv output2.csv"
+  abort "usage: get.rb packages.txt advisory.csv output.csv"
 end
 
 #Print beginning time
@@ -10,12 +10,12 @@ time1 = Time.new
 puts "Current Time : " + time1.inspect
 
 input_csv  = File.open(ARGV[0],"r")
-output1_csv = File.open(ARGV[1],"w+")
-output2_csv = File.open(ARGV[2],"w+")
+input_csv  = File.open(ARGV[1],"r")
+output1_csv = File.open(ARGV[2],"w+")
 
 packages = "grep iptables iputils libyaml lua libX11 nano readline rpm yum"
 
-#Search our current CSV for matching criteria and output the patch.
+#Search advisory for matching criteria and output the patch.
 CSV.foreach(input_csv) do |row|       
     #match package
     @temp = row[3].split('.')[0]  
