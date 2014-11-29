@@ -15,7 +15,7 @@
 # Input:    CSV from git.
 # Input:    CSV file of patched rows.
 # Output:   CSV from git with patch updates.
-# Output:   Changelog. 
+# Output:   Changelog.
 #
 # TESTING (files are in git):
 #
@@ -66,8 +66,10 @@ CSV.foreach(input1_csv) do |row|
     
           # So we match only on the major version below.  This ensures thus ensuring all minor versions in our database are updated
           # in response to the advisory update.
-          @temp1 = row[1].split('.')[0]
-          @temp2 = line[1].split('.')[0]
+          #@temp1 = row[1].split('.')[0]
+          #@temp2 = line[1].split('.')[0]
+          @temp1 = VersionHelper.major(row[1])
+          @temp1 = VersionHelper.major(line[1])
 
           # Match on package.  exclude architecture from comparision by taking only first atom
           @temp3 = row[3].split('.')[0]
