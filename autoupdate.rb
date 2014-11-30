@@ -55,48 +55,47 @@ output2_csv = File.open(ARGV[3],"w+")
 @linespatchedcount = 0
 
 #Search our current CSV for matching criteria and apply the patch.
-CSV.foreach(input1_csv) do |row|       
+CSV.foreach(input1_csv) do |row|
   @rowfound = false
 
   # we only care about rows with a status of 'noadv' or 'truepos'.  (Only these states can occur before a patch comes out).
   if row[6] == 'noadv' or row[6] == 'truepos'
 
-     #For every row in the Redhat Advisory
-     CSV.foreach(input2_csv) do |line|
-    
-          # So we match only on the major version below.  This ensures thus ensuring all minor versions in our database are updated
-          # in response to the advisory update.
-          #@temp1 = row[1].split('.')[0]
-          #@temp2 = line[1].split('.')[0]
-          @temp1 = VersionHelper.major(row[1])
-          @temp1 = VersionHelper.major(line[1])
+    #For every row in the Redhat Advisory
+    CSV.foreach(input2_csv) do |line|
 
-          # Match on package.  exclude architecture from comparision by taking only first atom
-          @temp3 = row[3].split('.')[0]
+      # So we match only on the major version below.  This ensures thus ensuring all minor versions in our database are updated
+      # in response to the advisory update.
+      @temp1 = VersionHelper.major(row[1])
+      @temp1 = VersionHelper.major(line[1])
 
-          # The lines we update are defined as having a status of 'noadv' or 'truepos', and 
-          # the same major version, architecture, package and CVE as our new row with a minfix.
-          #if @temp1 == @temp2 and row[2] == line[2] and row[3] == line[3] and row[5] == line[5]
-          if (@temp1 == @temp2 and (line[3].include? @temp3) and row[5] == line[5])
-              @rowfound = true     
-              @linespatchedcount = @linespatchedcount + 1
- 
-              #For QA, write both rows to the changelog.  Every change made is recorded right here!
-              output2_csv.write(row.to_csv)     #write out row of this match to the changelog
-              output2_csv.write(line.to_csv)    #write out line of this match to the changelog
-              output2_csv.write("\n")    #write out line of this match to the changelog
-            
-              row[6] = "patched"                #update status
-              row[7] = line[7]                  #update minfix
-              row[9] = "Autopatch.rb 11/14/14"  #FIX THIS DATE  
-              output1_csv.write(row.to_csv)     #HERE:  WE UPDATE A LINE OF OUR CSV WITH A PATCH.  THIS IS ALL THIS PROGRAM DOES.
-              puts row.to_csv
-              break
-           end
+      # Match on package.  exclude architecture from comparision by taking only first atom
+      @temp3 = row[3].split('.')[0]
+
+      # The lines we update are defined as having a status of 'noadv' or 'truepos', and
+      # the same major version, architecture, package and CVE as our new row with a minfix.
+      #if @temp1 == @temp2 and row[2] == line[2] and row[3] == line[3] and row[5] == line[5]
+      if (@temp1 == @temp2 and (line[3].include? @temp3) and row[5] == line[5])
+        @rowfound = true
+        @linespatchedcount = @linespatchedcount + 1
+
+        #For QA, write both rows to the changelog.  Every change made is recorded right here!
+        output2_csv.write(row.to_csv)     #write out row of this match to the changelog
+        output2_csv.write(line.to_csv)    #write out line of this match to the changelog
+        output2_csv.write("\n")    #write out line of this match to the changelog
+
+        row[6] = "patched"                #update status
+        row[7] = line[7]                  #update minfix
+        row[9] = "Autopatch.rb 11/14/14"  #FIX THIS DATE
+        output1_csv.write(row.to_csv)     #HERE:  WE UPDATE A LINE OF OUR CSV WITH A PATCH.  THIS IS ALL THIS PROGRAM DOES.
+        puts row.to_csv
+        break
       end
+    end
   end
+
   if @rowfound == false
-     output1_csv.write(row.to_csv)    #HERE:  WE OUTPUT THE ORIGINAL ROW BECUASE THERE WAS NO MATCH.
+    output1_csv.write(row.to_csv)    #HERE:  WE OUTPUT THE ORIGINAL ROW BECUASE THERE WAS NO MATCH.
   end
 end
 
