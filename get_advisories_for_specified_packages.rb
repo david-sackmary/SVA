@@ -9,7 +9,8 @@ end
 time1 = Time.new
 puts "Current Time : " + time1.inspect
 
-input_csv  = File.open(ARGV[0],"r") # redundant?
+input_csv  = File.open(ARGV[0],"r") # redundant? this arg replaces the hardcoded 'packages' array below.  input from user instead
+                                    # thanks fro studying this code with a close eye!
 input_csv  = File.open(ARGV[1],"r")
 output1_csv = File.open(ARGV[2],"w+")
 
