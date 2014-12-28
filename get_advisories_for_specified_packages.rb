@@ -9,12 +9,9 @@ end
 time1 = Time.new
 puts "Current Time : " + time1.inspect
 
-input_csv  = File.open(ARGV[0],"r") # redundant? this arg replaces the hardcoded 'packages' array below.  input from user instead
-                                    # thanks fro studying this code with a close eye!
+packages   = File.open(ARGV[0],"r") 
 input_csv  = File.open(ARGV[1],"r")
 output1_csv = File.open(ARGV[2],"w+")
-
-packages = "grep iptables iputils libyaml lua libX11 nano readline rpm yum"
 
 # Search advisory for matching criteria and output the patch.
 CSV.foreach(input_csv) do |row|
