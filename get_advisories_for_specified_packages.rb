@@ -14,7 +14,7 @@ output1_csv = File.open(ARGV[2], 'w+')
 # Search advisory for matching criteria and output the patch.
 CSV.foreach(input_csv) do |row|
   # match package
-  package = row[3].split('.')[0]
+  package = VersionHelper.major(row[3])
   if packages.include? package
     if row[1] == '6' || row[1] == '6.0'
       if row[6] == 'patched'
