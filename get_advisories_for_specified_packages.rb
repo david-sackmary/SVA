@@ -20,8 +20,6 @@ CSV.foreach(input_csv) do |row|
       if row[6] == 'patched'
         output1_csv.write(row[0] + ', ' + row[1] + ', ' + package + ', ' +
                           row[5] + ', ' + row[7] + "\n")
-      else
-        output2_csv.write(row.to_csv)
       end
     end
   end
@@ -29,7 +27,6 @@ end
 
 input_csv.close
 output1_csv.close
-output2_csv.close
 
 # Print ending time
 time1 = Time.new
