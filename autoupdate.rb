@@ -40,30 +40,29 @@ require 'csv'
 require 'optparse'
 
 if ARGV.length != 4
-  abort "usage: autopatch.rb current_CSV_from_git.csv just-patches_from_new_pull.csv updated-CSV_from_git.csv changelog.csv"
+  abort 'usage: autopatch.rb current_CSV_from_git.csv just-patches_from_new_pull.csv updated-CSV_from_git.csv changelog.csv'
 end
 
-#Print beginning time
+# Print beginning time
 time1 = Time.new
-puts "Current Time : " + time1.inspect
+puts 'Current Time : ' + time1.inspect
 
-input1_csv  = File.open(ARGV[0],"r")
-input2_csv  = File.open(ARGV[1],"r")
-output1_csv = File.open(ARGV[2],"w+")
-output2_csv = File.open(ARGV[3],"w+")
+input1_csv  = File.open(ARGV[0], 'r')
+input2_csv  = File.open(ARGV[1], 'r')
+output1_csv = File.open(ARGV[2], 'w+')
+output2_csv = File.open(ARGV[3], 'w+')
 
 @linespatchedcount = 0
 
-#Search our current CSV for matching criteria and apply the patch.
+# Search our current CSV for matching criteria and apply the patch.
 CSV.foreach(input1_csv) do |row|
   @rowfound = false
 
   # we only care about rows with a status of 'noadv' or 'truepos'.  (Only these states can occur before a patch comes out).
-  if row[6] == 'noadv' or row[6] == 'truepos'
+  if row[6] == 'noadv' || row[6] == 'truepos'
 
-    #For every row in the Redhat Advisory
+    # For every row in the Redhat Advisory
     CSV.foreach(input2_csv) do |line|
-
       # So we match only on the major version below.  This ensures thus ensuring all minor versions in our database are updated
       # in response to the advisory update.
       @temp1 = VersionHelper.major(row[1])
@@ -74,20 +73,20 @@ CSV.foreach(input1_csv) do |row|
 
       # The lines we update are defined as having a status of 'noadv' or 'truepos', and
       # the same major version, architecture, package and CVE as our new row with a minfix.
-      #if @temp1 == @temp2 and row[2] == line[2] and row[3] == line[3] and row[5] == line[5]
-      if (@temp1 == @temp2 and (line[3].include? @temp3) and row[5] == line[5])
+      # if @temp1 == @temp2 and row[2] == line[2] and row[3] == line[3] and row[5] == line[5]
+      if @temp1 == @temp2 && (line[3].include? @temp3) && row[5] == line[5]
         @rowfound = true
         @linespatchedcount = @linespatchedcount + 1
 
-        #For QA, write both rows to the changelog.  Every change made is recorded right here!
-        output2_csv.write(row.to_csv)     #write out row of this match to the changelog
-        output2_csv.write(line.to_csv)    #write out line of this match to the changelog
-        output2_csv.write("\n")    #write out line of this match to the changelog
+        # For QA, write both rows to the changelog.  Every change made is recorded right here!
+        output2_csv.write(row.to_csv)     # write out row of this match to the changelog
+        output2_csv.write(line.to_csv)    # write out line of this match to the changelog
+        output2_csv.write("\n")    # write out line of this match to the changelog
 
-        row[6] = "patched"                #update status
-        row[7] = line[7]                  #update minfix
-        row[9] = "Autopatch.rb 11/14/14"  #FIX THIS DATE
-        output1_csv.write(row.to_csv)     #HERE:  WE UPDATE A LINE OF OUR CSV WITH A PATCH.  THIS IS ALL THIS PROGRAM DOES.
+        row[6] = 'patched'                # update status
+        row[7] = line[7]                  # update minfix
+        row[9] = 'Autopatch.rb 11/14/14'  # FIX THIS DATE
+        output1_csv.write(row.to_csv)     # HERE:  WE UPDATE A LINE OF OUR CSV WITH A PATCH.  THIS IS ALL THIS PROGRAM DOES.
         puts row.to_csv
         break
       end
@@ -95,20 +94,20 @@ CSV.foreach(input1_csv) do |row|
   end
 
   if @rowfound == false
-    output1_csv.write(row.to_csv)    #HERE:  WE OUTPUT THE ORIGINAL ROW BECUASE THERE WAS NO MATCH.
+    output1_csv.write(row.to_csv)    # HERE:  WE OUTPUT THE ORIGINAL ROW BECUASE THERE WAS NO MATCH.
   end
 end
 
 puts "Autopatch.rb:  There were a total of #{@linespatchedcount} rows updated"
 
-input1_csv.close()
-input2_csv.close()
-output1_csv.close()
-output2_csv.close()
+input1_csv.close
+input2_csv.close
+output1_csv.close
+output2_csv.close
 
-#Print ending time
+# Print ending time
 time1 = Time.new
-puts "Current Time : " + time1.inspect
+puts 'Current Time : ' + time1.inspect
 
 ### VERIFY RESULTS AFTER PROGRAM HAS COMPLETED:
 
@@ -116,10 +115,10 @@ puts "Current Time : " + time1.inspect
 #
 # Verify that the number of lines of input matches the number of lines of output:
 #
-#num_lines_in   = sum(1 for line in open(sys.argv[2]))
-#num_lines_out  = sum(1 for line in open(sys.argv[3]))
-#if (num_lines_in == num_lines_out):
+# num_lines_in   = sum(1 for line in open(sys.argv[2]))
+# num_lines_out  = sum(1 for line in open(sys.argv[3]))
+# if (num_lines_in == num_lines_out):
 #   print "Autopatch.py PASS: input %d lines, output %d lines" % (num_lines_in, num_lines_out)
-#else
+# else
 #   sys.exit("Autopatch.py FAIL: input %d lines, output %d lines" % (num_lines_in, num_lines_out))
-#end
+# end
